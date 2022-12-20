@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <title>Basic Path Test</title>
+        <script src="../cachedcontext.js" ></script>
+    </head>
+    <body>
+        <p>
+            After the shapes are drawn to the top canvas, it is copied to the bottom canvas, the top canvas is cleared, and then rerun is used to recreate the image. Both canvases should be the same.
+        </p>
+        <canvas id="testCanvas" width="500" height="500"></canvas>
+        <canvas id="storeCanvas" width="500" height="500"></canvas>
+        <script>
+            const testCanvas = document.getElementById('testCanvas');
+            const storeCanvas = document.getElementById('storeCanvas');
+
+            const testContext = testCanvas.getContext('2d');
+            const storeContext = storeCanvas.getContext('2d');
+            const proxyContext = CachedContext(testContext);
+
+            // fill and stroke some shapes and text with various settings
+            proxyContext.fillStyle = 'red';
+            proxyContext.strokeStyle = 'green';
+            proxyContext.font = '150px serif';
+            proxyContext.textAlign = 'center';
+            proxyContext.textBaseline = 'middle';
+            proxyContext.lineWidth = 10;
+            proxyContext.fillRect(10, 10, 230, 230);
+            proxyContext.strokeRect(10, 10, 230, 230);
+
+            proxyContext.lineWidth = 5;
+            proxyContext.fillText('Test', 375, 125);
+            proxyContext.strokeText('Test', 375, 125);
+
+            proxyContext.lineWidth = 10;
+            proxyContext.lineCap = 'round';
+            proxyContext.lineJoin = 'round';
+            proxyContext.fillStyle = 'blue';
+            proxyContext.strokeStyle = 'yellow';
+
+            proxyContext.beginPath();
+            proxyContext.moveTo(100, 490);
+            proxyContext.lineTo(125, 260);
+            proxyContext.lineTo(150, 490);
+            proxyContext.fill();
+            proxyContext.stroke();
+            
+            proxyContext.lineWidth = 8;
+            proxyContext.lineCap = 'square';
+            proxyContext.lineJoin = 'bevel';
+
+            proxyContext.beginPath();
+            proxyContext.moveTo(260, 260);
+            proxyContext.arcTo(375, 260, 375, 375, 115);
+            proxyContext.bezierCurveTo(375, 490, 490, 375, 490, 490);
+            proxyContext.quadraticCurveTo(260, 490, 280, 375);
+            proxyContext.closePath();
+            proxyContext.rect(280, 280, 30, 30);
+            
+            proxyContext.fill('evenodd');
+            proxyContext.stroke();
+
+            // draw the testCanvas to the storeCanvas, clear the testCanvas, and then rerun the proxy to redraw everything
+            storeContext.drawImage(testCanvas, 0, 0);
+            testContext.clearRect(0, 0, 500, 500);
+            proxyContext.rerun();
+            
+        </script>
+    </body>
+</html>

@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <title>Basic Path Test</title>
+        <script src="../cachedcontext.js" ></script>
+    </head>
+    <body>
+        <p>
+            The object returned by CachedContext is used to draw **** to the canvas, 
+        </p>
+        <canvas id="testCanvas" width="500" height="500"></canvas>
+        <canvas id="storeCanvas" width="500" height="500"></canvas>
+        <script>
+            const testCanvas = document.getElementById('testCanvas');
+            const storeCanvas = document.getElementById('storeCanvas');
+
+            const testContext = testCanvas.getContext('2d');
+            const storeContext = storeCanvas.getContext('2d');
+            const proxyContext = CachedContext(testContext);
+
+            // draw three rectangles, saving the state between them, then use rerun with specific indexes to draw them in the other order
+            const save1 = proxyContext.saveState();
+            proxyContext.fillStyle = 'red';
+            proxyContext.fillRect(10, 10, 200, 200);
+            const save2 = proxyContext.saveState();
+            proxyContext.shadowBlur = 20;
+            proxyContext.shadowColor = 'black';
+            proxyContext.fillStyle = 'blue';
+            proxyContext.beginPath();
+            proxyContext.rect(110, 110, 200, 200)
+            proxyContext.fill();
+            const save3 = proxyContext.saveState();
+            proxyContext.translate(200, 200);
+            proxyContext.fillStyle = 'green'
+            const path = new Path2D();
+            path.rect(10, 10, 200, 200);
+            proxyContext.fill(path);
+            const save4 = proxyContext.saveState();
+
+            
+            // draw the testCanvas to the storeCanvas, clear the testCanvas, and then rerun the proxy to redraw everything
+            storeContext.drawImage(testCanvas, 0, 0);
+            testContext.clearRect(-200, -200, 500, 500);
+            proxyContext.rerun(save3, save4);
+            proxyContext.rerun(save2, save3);
+            proxyContext.rerun(save1, save2);
+        </script>
+    </body>
+</html>

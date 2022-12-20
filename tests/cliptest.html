@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <title>Basic Path Test</title>
+        <script src="../cachedcontext.js" ></script>
+    </head>
+    <body>
+        <p>
+            After the shapes are drawn to the top canvas, it is copied to the bottom canvas, the top canvas is cleared, and then rerun is used to recreate the image. Both canvases should be the same.
+        </p>
+        <p>
+            clip() is called twice in this example, once between save/restore calls, and once outside. This demonstrates that CachedContext handles clipping left in place when rerun is called.
+        </p>
+        <canvas id="testCanvas" width="500" height="500"></canvas>
+        <canvas id="storeCanvas" width="500" height="500"></canvas>
+        <script>
+            const testCanvas = document.getElementById('testCanvas');
+            const storeCanvas = document.getElementById('storeCanvas');
+
+            const testContext = testCanvas.getContext('2d');
+            const storeContext = storeCanvas.getContext('2d');
+            let proxyContext = CachedContext(testContext);
+
+            function addClip(ctx, x) {
+                ctx.beginPath();
+                ctx.rect(100 + x, 200, 200, 200);
+                ctx.clip();
+
+            }
+
+            // checking to see if the clip is being restored correctly requires that the non proxied context is saved and restored before clearing, then the clip is reapplied before rerunning
+            testContext.save();
+            
+            // draw a rectangle, clip within a proxied save/restore and fill a rectangle, then clip outside a save/restore and fill another
+            proxyContext.fillStyle = 'blue';
+            proxyContext.fillRect(10, 10, 480, 480);
+            proxyContext.save();
+            addClip(proxyContext, 100);
+            proxyContext.fillStyle = 'green';
+            proxyContext.fillRect(10, 10, 480, 480);
+            proxyContext.restore();
+            addClip(proxyContext, 0);
+            proxyContext.fillStyle = 'yellow';
+            proxyContext.fillRect(10, 10, 480, 480);
+            
+            // draw the testCanvas to the storeCanvas, clear the testCanvas, and then rerun the proxy to redraw everything
+            storeContext.drawImage(testCanvas, 0, 0);
+            testContext.restore();
+            testContext.clearRect(0, 0, 500, 500);
+            addClip(testContext);
+            proxyContext.rerun();
+        </script>
+    </body>
+</html>

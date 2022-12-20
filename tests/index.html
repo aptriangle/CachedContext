@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <title>CachedContext tests</title>
+    </head>
+    <body>
+        <p>
+            The test pages demonstrate the ability of the CachedContext to accurately rerun CanvasRenderingContext2D operations, even if the state of previously supplied objects has changed. CachedContext does not cache image data that comes from external sources, due to the large amount of memory that could require. drawImage, etc., will still work, but rerunning the command will use the orginal obejct, which could create a different result if the original object has changed.
+        </p>
+        <p>
+            <a href="basicpathtest.html">Basic Path Test</a> - Fill and stroke paths and text
+        </p>
+        <p>
+            <a href="cliptest.html">Clip Test</a> - Removing a clip requires save/restore commands. CachedContext uses additional saves/restores to allow reruns when they were not used in the original run.
+        </p>
+        <p>
+            <a href="gradientstest.html">Gradients Test</a> - Because gradients can be modified after they are used, CachedContext creates new gradients when rerunning.
+        </p>
+        <p>
+            <a href="partialruntest.html">Partial Run Test</a> - CachedContext has the ability to run only a portion of the cached commands. This example uses this feature to redraw three rectangles in the opposite order.
+        </p>
+        <p>
+            <a href="path2dtest.html">Path2D Test</a> - Path2D objects can be changed after use, so CachedContext stores copies of Path2D objects whenever they are used.
+        </p>
+        <p>
+            <a href="transformsave.html">Transform/Save Test</a> - CachedContext saves thes current state, including transforms, when first created, as the first command, so a canvas left in a transformed state does not change the rerun.
+        </p>
+    </body>
+</html>

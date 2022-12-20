@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <title>Transform & Save/Restore Test</title>
+        <script src="../cachedcontext.js" ></script>
+    </head>
+    <body>
+        <p>
+            After the shapes are drawn to the top canvas, it is copied to the bottom canvas, the top canvas is cleared, and then rerun is used to recreate the image. Both canvases should be the same.
+        </p>
+        <p>
+            Translation, rotation and scaling are used here, both inside and outside save/restore calls. This demonstrates that CachedContext can handle a canvas being left in a transformed state.
+        </p>
+        <canvas id="testCanvas" width="500" height="500"></canvas>
+        <canvas id="storeCanvas" width="500" height="500"></canvas>
+        <script>
+            const testCanvas = document.getElementById('testCanvas');
+            const storeCanvas = document.getElementById('storeCanvas');
+
+            const testContext = testCanvas.getContext('2d');
+            const storeContext = storeCanvas.getContext('2d');
+            const proxyContext = CachedContext(testContext);
+
+            // draw a shape with various transforms
+            function drawShape() {
+                proxyContext.fillRect(-20, -20, 40, 40);
+                proxyContext.strokeRect(-20, -20, 40, 40);
+            }
+
+            proxyContext.save();
+            proxyContext.fillStyle = 'blue';
+            proxyContext.translate(30, 30);
+            drawShape();
+            proxyContext.translate(20, 20);
+            proxyContext.rotate(Math.PI / 4);
+            drawShape();
+            proxyContext.translate(40, -40);
+            proxyContext.scale(2, 2);
+            drawShape();
+            proxyContext.restore();
+            proxyContext.fillStyle = 'rgba(255, 0, 0, 0.5)';
+            proxyContext.translate(30, 30);
+            drawShape();
+            
+            // draw the testCanvas to the storeCanvas, clear the testCanvas, and then rerun the proxy to redraw everything
+            storeContext.drawImage(testCanvas, 0, 0);
+            testContext.clearRect(0, 0, 500, 500);
+            proxyContext.rerun();
+        </script>
+    </body>
+</html>

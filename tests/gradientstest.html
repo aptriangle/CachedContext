@@ -1,0 +1,60 @@
+<html>
+    <head>
+        <title>Gradient Test</title>
+        <script src="../cachedcontext.js" ></script>
+    </head>
+    <body>
+        <p>
+            After the shapes are drawn to the top canvas, it is copied to the bottom canvas, the top canvas is cleared, and then rerun is used to recreate the image. Both canvases should be the same.
+        </p>
+        <p>
+            Three types of gradient are created, through the CachedContext, drawn to the context, and then an additional colorStop is added to each. This demonstrates that CachedContext handles gradients changing between their original use and the call to rerun.
+        </p>
+        <canvas id="testCanvas" width="500" height="500"></canvas>
+        <canvas id="storeCanvas" width="500" height="500"></canvas>
+        <script>
+            const testCanvas = document.getElementById('testCanvas');
+            const storeCanvas = document.getElementById('storeCanvas');
+
+            const testContext = testCanvas.getContext('2d');
+            const storeContext = storeCanvas.getContext('2d');
+            const proxyContext = CachedContext(testContext);
+
+            // create some gradients and draw them in rects
+            const linear = proxyContext.createLinearGradient(10, 10, 240, 240);
+            const radial = proxyContext.createRadialGradient(375, 125, 0, 375, 125, 240);
+            const conic = proxyContext.createConicGradient(0, 125, 375);
+
+            linear.addColorStop(0, 'red');
+            linear.addColorStop(0.8, 'green');
+            linear.addColorStop(1, 'blue');
+
+            radial.addColorStop(0, 'yellow');
+            radial.addColorStop(0.8, 'purple');
+            radial.addColorStop(1, 'lime');
+
+            conic.addColorStop(0, 'cyan');
+            conic.addColorStop(0.8, 'orange');
+            conic.addColorStop(1, 'gray');
+
+            proxyContext.fillStyle = linear;
+            proxyContext.fillRect(10, 10, 230, 230);
+            
+            proxyContext.fillStyle = radial;
+            proxyContext.fillRect(260, 10, 230, 230);
+            
+            proxyContext.fillStyle = conic;
+            proxyContext.fillRect(10, 260, 230, 230);
+
+            // these color stops should not be displayed in the images, because they are added after the fillRect commands
+            linear.addColorStop(0.4, 'black');
+            radial.addColorStop(0.4, 'black');
+            conic.addColorStop(0.4, 'black');
+            
+            // draw the testCanvas to the storeCanvas, clear the testCanvas, and then rerun the proxy to redraw everything
+            storeContext.drawImage(testCanvas, 0, 0);
+            testContext.clearRect(0, 0, 500, 500);
+            proxyContext.rerun();
+        </script>
+    </body>
+</html>
